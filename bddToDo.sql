@@ -156,16 +156,16 @@ BEGIN
     JOIN Bacheca B ON T.ID_Bacheca = B.ID_Bacheca
     WHERE T.ID_ToDo = NEW.ID_ToDo;
 
-	--Controllo se la bacheca esiste già per il destinatario
+	--Controllo se esiste una bacheca con lo stesso titolo
 	SELECT ID_Bacheca INTO v_esiste
 	FROM Bacheca
-	WHERE ID_Utente = NEW.ID_Utente AND titolo = v_titolo_orig AND descrizione = v_desc_orig;
-
-    -- Creo  la nuova bacheca per il destinatario
+	WHERE ID_Utente = NEW.ID_Utente AND titolo = v_titolo_orig
+	LIMIT 1;--basta una
+    -- Se NON esiste nessuna bacheca con quel titolo, allora la creo
 	IF v_esiste IS NULL THEN
    		INSERT INTO Bacheca (titolo, descrizione, ID_Utente)
     	VALUES (v_titolo_orig, v_desc_orig, NEW.ID_Utente);
-    	RAISE NOTICE 'Creata nuova copia bacheca % per utente %', v_titolo_orig, NEW.ID_Utente;
+    	RAISE NOTICE 'Creata nuova bacheca % per utente %', v_titolo_orig, NEW.ID_Utente;
 	END IF;
 	
     RETURN NEW;
@@ -294,7 +294,6 @@ JOIN Bacheca B_Originale ON T.ID_Bacheca = B_Originale.ID_Bacheca
 JOIN Bacheca B_Clone ON 
     B_Clone.ID_Utente = C.ID_Utente 
     AND B_Clone.titolo = B_Originale.titolo
-	AND B_Clone.descrizione = B_Originale.descrizione;
 
 -- ============================================================
 -- FUNZIONI
@@ -597,7 +596,7 @@ BEGIN
     RETURN QUERY
     SELECT 
         v.ID_ToDo, 
-        v.Titolo, 
+        v.Nome_ToDo, 
         v.Descrizione, 
         v.DataScadenza, 
         v.Stato, 
