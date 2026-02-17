@@ -1,13 +1,15 @@
 -- ============================================================
--- 1. PULIZIA E RESET TOTALE
+-- PULIZIA E RESET TOTALE
 -- ============================================================
--- Fondamentale: resetta gli ID in modo che Mario sia 1, Luigi sia 2, ecc.
+--Resetta gli ID in modo che Mario sia 1, Luigi sia 2 ecc.
 TRUNCATE TABLE Condivisione, Attivita, Checklist, ToDo, Bacheca, Utente RESTART IDENTITY CASCADE;
 
 
 -- ============================================================
--- 2. REGISTRAZIONE UTENTI (tramite registra_utente)
+-- REGISTRAZIONE UTENTI 
 -- ============================================================
+parametri: login password
+
 -- ID atteso: 1
 SELECT registra_utente('mario_rossi', 'passMario1'); 
 -- ID atteso: 2
@@ -17,9 +19,9 @@ SELECT registra_utente('anna_bianchi', 'passAnna3');
 
 
 -- ============================================================
--- 3. CREAZIONE BACHECHE (tramite crea_bacheca_utente)
+-- CREAZIONE BACHECHE 
 -- ============================================================
--- Parametri: Titolo, Descrizione, ID_Utente
+-- parametri: Titolo, Descrizione, ID_Utente
 
 -- MARIO (ID 1) crea le sue bacheche
 -- ID Bacheca atteso: 1
@@ -35,13 +37,13 @@ SELECT crea_bacheca_utente('Lavoro', 'Turni Negozio', 2);
 
 
 -- ============================================================
--- 4. CREAZIONE TODO (tramite crea_todo_utente)
+-- CREAZIONE TODO
 -- ============================================================
--- Parametri: Titolo, Desc, Scadenza, Colore, Img, Url, ID_Utente, ID_Bacheca
+-- parametri: Titolo, Desc, Scadenza, Colore, Img, Url, ID_Utente, ID_Bacheca
 
 -- --- TODO DI MARIO (Utente 1) ---
 
--- 1. Inseriamo in 'Lavoro' (Bacheca 1) -> ID ToDo atteso: 1
+-- Inseriamo in 'Lavoro' (Bacheca 1) -> ID ToDo atteso: 1
 SELECT crea_todo_utente(
     'Consegnare Report', 
     'Report mensile vendite', 
@@ -53,8 +55,8 @@ SELECT crea_todo_utente(
     1 
 );
 
--- 2. Inseriamo in 'Lavoro' (Bacheca 1) -> ID ToDo atteso: 2
--- Nota: Il trigger calcolerà automaticamente la posizione 2
+-- Inseriamo in 'Lavoro' (Bacheca 1) -> ID ToDo atteso: 2
+-- (Il trigger calcolerà automaticamente la posizione 2)
 SELECT crea_todo_utente(
     'Riunione Team', 
     'Meeting settimanale', 
@@ -66,7 +68,7 @@ SELECT crea_todo_utente(
     1
 );
 
--- 3. Inseriamo in 'TempoLibero' (Bacheca 2) -> ID ToDo atteso: 3
+-- Inseriamo in 'TempoLibero' (Bacheca 2) -> ID ToDo atteso: 3
 SELECT crea_todo_utente(
     'Prenotare Calcetto', 
     'Chiamare il centro', 
@@ -94,7 +96,7 @@ SELECT crea_todo_utente(
 
 
 -- ============================================================
--- 5. GESTIONE CHECKLIST (tramite aggiungi_attivita...)
+-- GESTIONE CHECKLIST 
 -- ============================================================
 -- Lavoriamo sul ToDo "Studiare Basi di Dati" (ID 4)
 
@@ -109,19 +111,19 @@ SELECT aggiungi_attivita_checklist(4, 'Scrivere Trigger');
 SELECT aggiungi_attivita_checklist(4, 'Testare Funzioni');
 
 -- ============================================================
--- 6. MODIFICA STATO ATTIVITÀ (tramite modifica_stato_attivita)
+--  MODIFICA STATO ATTIVITÀ 
 -- ============================================================
 -- Segniamo le prime due come completate.
--- Parametri: ID_Attivita, NuovoStato
+-- parametri: ID_Attivita, NuovoStato
 
-SELECT modifica_stato_attivita(1, 'Completato'); -- Capire INSERT
-SELECT modifica_stato_attivita(2, 'Completato'); -- Scrivere Trigger
+SELECT modifica_stato_attivita(1, 'Completato'); 
+SELECT modifica_stato_attivita(2, 'Completato'); 
 
 -- Verifica Trigger: Il ToDo 4 dovrebbe essere ancora "NonCompletato" perché la 3 è incompleta.
 
 
 -- ============================================================
--- 7. CONDIVISIONE (tramite aggiungi_condivisione_todo)
+-- CONDIVISIONE 
 -- ============================================================
 -- Parametri: ID_ToDo, Login Autore, Login Destinatario
 
@@ -135,7 +137,7 @@ SELECT aggiungi_condivisione_todo(4, 'luigi_verdi', 'mario_rossi');
 
 
 -- ============================================================
--- 8. OPERAZIONI EXTRA (Modifiche e Spostamenti)
+--  MODIFICA E SPOSTAMENTO
 -- ============================================================
 
 -- Modifica stato manuale del ToDo 2 (Riunione Team) di Mario
@@ -148,7 +150,8 @@ SELECT cambia_bacheca_todo(3, 'mario_rossi', 'Lavoro', 'Progetti Ufficio');
 
 
 -- ============================================================
--- 9. VERIFICA FINALE
+-- VERIFICA FINALE
 -- ============================================================
--- Visualizziamo il risultato usando la tua Vista Unificata
+-- Visualizziamo il risultato usando la Vista Unificata
+
 SELECT * FROM Vista_Bacheca_Unificata ORDER BY ID_Utente_Visualizzatore, Posizione;
