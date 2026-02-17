@@ -988,14 +988,14 @@ BEGIN
 
     -- Sposta gli altri ToDo per fare spazio
     IF v_vecchia_posizione < p_nuova_posizione THEN
-        -- Spostamento verso il BASSO (es. da 2 a 5)
+        -- Spostamento verso il basso (es. da 2 a 5)
         UPDATE ToDo
         SET Posizione = Posizione - 1
         WHERE ID_Bacheca = v_id_bacheca
           AND Posizione > v_vecchia_posizione 
           AND Posizione <= p_nuova_posizione;
     ELSE
-        -- Spostamento verso l'ALTO (es. da 5 a 2)
+        -- Spostamento verso l'alto (es. da 5 a 2)
         UPDATE ToDo
         SET Posizione = Posizione + 1
         WHERE ID_Bacheca = v_id_bacheca
@@ -1012,3 +1012,4 @@ BEGIN
 END;
 
 $$ LANGUAGE plpgsql;
+
