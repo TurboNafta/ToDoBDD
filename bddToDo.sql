@@ -959,8 +959,8 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- Funzione per cambiare la posizione di un ToDo nella stessa bacheca (Drag & Drop o Su/Giù).
--- Gestisce lo spostamento di tutti gli altri ToDo per fare spazio.
+-- Funzione per cambiare la posizione di un ToDo nella stessa bacheca 
+-- gestisce lo spostamento di tutti gli altri ToDo per fare spazio.
 CREATE OR REPLACE FUNCTION sposta_todo_posizione(
     p_id_todo INT,
     p_nuova_posizione INT
@@ -1010,4 +1010,5 @@ BEGIN
     
     RAISE NOTICE 'ToDo spostato dalla posizione % alla %.', v_vecchia_posizione, p_nuova_posizione;
 END;
+
 $$ LANGUAGE plpgsql;
