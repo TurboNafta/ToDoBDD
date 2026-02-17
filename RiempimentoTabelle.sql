@@ -8,7 +8,7 @@ TRUNCATE TABLE Condivisione, Attivita, Checklist, ToDo, Bacheca, Utente RESTART 
 -- ============================================================
 -- REGISTRAZIONE UTENTI 
 -- ============================================================
-parametri: login password
+--parametri: login password
 
 -- ID atteso: 1
 SELECT registra_utente('mario_rossi', 'passMario1'); 
@@ -148,10 +148,41 @@ SELECT modifica_stato_todo(2, 'mario_rossi', 'Completato');
 -- Parametri: ID_ToDo, Login, Titolo Nuova, Descrizione Nuova
 SELECT cambia_bacheca_todo(3, 'mario_rossi', 'Lavoro', 'Progetti Ufficio');
 
+-- ============================================================
+-- TEST DELLA VISTA E FILTRI 
+-- ============================================================
+
+-- Ricerca testuale: Trova tutti i ToDo che contengono "Report" (nel titolo o descrizione)
+-- Deve trovare il ToDo 1 di Mario e la copia condivisa di Anna
+SELECT * FROM filtra_todo_bacheca(1, 'TITOLO', 'Report');
+
+--  Ricerca ToDo in scadenza OGGI
+SELECT * FROM filtra_todo_bacheca(1, 'OGGI');
+
+-- Ordinamento per STATO: mostra prima i completati
+-- Vedremo il ToDo 2 (Riunione) in cima perché lo abbiamo forzato a 'Completato'
+SELECT * FROM visualizza_todo_ordinati(1, 'STATO');
 
 -- ============================================================
--- VERIFICA FINALE
+-- VISTA DI TUTTI I TODO DI UN UTENTE
 -- ============================================================
--- Visualizziamo il risultato usando la Vista Unificata
+-- Recupera tutti i todo (sia quelli creati da Mario, sia quelli condivisi con esso)
+SELECT * FROM Vista_Bacheca_Unificata WHERE ID_Utente_Visualizzatore = 1;
 
-SELECT * FROM Vista_Bacheca_Unificata ORDER BY ID_Utente_Visualizzatore, Posizione;
+-- ============================================================
+-- TEST DI FALLIMENTO
+-- ============================================================
+
+-- .Tentativo di creare una bacheca con titolo non ammesso
+-- Deve fallire per il vincolo di checl sul titolo
+--SELECT crea_bacheca_utente('Scuola', 'Bacheca non valida', 1);
+
+-- Tentativo di auto-condivisione
+-- Deve fallire perché Mario non può condividere il ToDo 1 con se stesso
+-- Trigger: trg_prevenire_auto_condivisione
+--SELECT aggiungi_condivisione_todo(1, 'mario_rossi', 'mario_rossi');
+
+-- Tentativo di creare una bacheca duplicata (stesso titolo e stessa descrizione)
+-- deve fallire per il vincolo UNIQUE: unique_bacheca_desc
+--SELECT crea_bacheca_utente('Lavoro', 'Progetti Ufficio', 1);
+
