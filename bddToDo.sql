@@ -293,7 +293,7 @@ JOIN ToDo T ON C.ID_ToDo = T.ID_ToDo
 JOIN Bacheca B_Originale ON T.ID_Bacheca = B_Originale.ID_Bacheca
 JOIN Bacheca B_Clone ON 
     B_Clone.ID_Utente = C.ID_Utente 
-    AND B_Clone.titolo = B_Originale.titolo
+    AND B_Clone.titolo = B_Originale.titolo;
 
 -- ============================================================
 -- FUNZIONI
@@ -610,7 +610,7 @@ BEGIN
         (p_criterio = 'TUTTO')-- nessun criterio, mostro tutto
         OR 
         (p_criterio = 'TITOLO' AND (--ricerca qualsiasi parola nel titolo o nella descrizione
-            v.Titolo ILIKE '%' || COALESCE(p_filtro_testo, '') || '%' OR 
+            v.Nome_ToDo ILIKE '%' || COALESCE(p_filtro_testo, '') || '%' OR 
             v.Descrizione ILIKE '%' || COALESCE(p_filtro_testo, '') || '%'
         ))
         OR
@@ -959,8 +959,8 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- Funzione per cambiare la posizione di un ToDo nella stessa bacheca 
--- gestisce lo spostamento di tutti gli altri ToDo per fare spazio.
+-- Funzione per cambiare la posizione di un ToDo nella stessa bacheca (Drag & Drop o Su/Giù).
+-- Gestisce lo spostamento di tutti gli altri ToDo per fare spazio.
 CREATE OR REPLACE FUNCTION sposta_todo_posizione(
     p_id_todo INT,
     p_nuova_posizione INT
@@ -988,14 +988,14 @@ BEGIN
 
     -- Sposta gli altri ToDo per fare spazio
     IF v_vecchia_posizione < p_nuova_posizione THEN
-        -- Spostamento verso il basso (es. da 2 a 5)
+        -- Spostamento verso il BASSO (es. da 2 a 5)
         UPDATE ToDo
         SET Posizione = Posizione - 1
         WHERE ID_Bacheca = v_id_bacheca
           AND Posizione > v_vecchia_posizione 
           AND Posizione <= p_nuova_posizione;
     ELSE
-        -- Spostamento verso l'alto (es. da 5 a 2)
+        -- Spostamento verso l'ALTO (es. da 5 a 2)
         UPDATE ToDo
         SET Posizione = Posizione + 1
         WHERE ID_Bacheca = v_id_bacheca
@@ -1010,6 +1010,4 @@ BEGIN
     
     RAISE NOTICE 'ToDo spostato dalla posizione % alla %.', v_vecchia_posizione, p_nuova_posizione;
 END;
-
 $$ LANGUAGE plpgsql;
-
